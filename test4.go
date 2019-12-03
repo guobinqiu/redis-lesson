@@ -38,9 +38,9 @@ func reduce4(client *redis.Client, wg *sync.WaitGroup) {
 }
 
 func lock(client *redis.Client) (bool, error) {
-	return client.SetNX("suo", true, 0).Result()
+	return client.SetNX("count.lock", true, 0).Result()
 }
 
 func unlock(client *redis.Client) {
-	client.Del("suo")
+	client.Del("count.lock")
 }
