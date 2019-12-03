@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/go-redis/redis"
 )
@@ -26,19 +27,21 @@ func main() {
 }
 
 func reduce4(client *redis.Client, wg *sync.WaitGroup) {
-	ok, _ := lock(client)
-	if ok {
+	lock(client, func() {
 		count, _ := client.Get("count").Int()
 		if count > 0 {
 			client.Decr("count")
 		}
-		unlock(client)
-	}
+	})
 	wg.Done()
 }
 
-func lock(client *redis.Client) (bool, error) {
-	return client.SetNX("count.lock", true, 0).Result()
+func lock(client *redis.Client, doSomething func()) {
+	ok, _ := client.SetNX("count.lock", true, 60*time.Second).Result()
+	if ok {
+		doSomething()
+		unlock(client)
+	}
 }
 
 func unlock(client *redis.Client) {
