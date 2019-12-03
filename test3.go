@@ -18,14 +18,14 @@ func main() {
 	var wg sync.WaitGroup
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
-		go reduceInventory3(client, &wg)
+		go reduce3(client, &wg)
 	}
 	wg.Wait()
 
 	fmt.Println("done")
 }
 
-func reduceInventory3(client *redis.Client, wg *sync.WaitGroup) {
+func reduce3(client *redis.Client, wg *sync.WaitGroup) {
 	client.Decr("count")
 	wg.Done()
 }

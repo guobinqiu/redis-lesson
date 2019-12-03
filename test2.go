@@ -18,7 +18,7 @@ func main() {
 	var wg sync.WaitGroup
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
-		reduceInventory2(client, &wg)
+		reduce2(client, &wg)
 	}
 	wg.Wait()
 
@@ -26,7 +26,7 @@ func main() {
 }
 
 //https://redis.io/topics/transactions
-func reduceInventory2(client *redis.Client, wg *sync.WaitGroup) {
+func reduce2(client *redis.Client, wg *sync.WaitGroup) {
 	pipe := client.TxPipeline()
 	i, _ := client.Get("count").Int()
 	pipe.Set("count", i-1, 0)
